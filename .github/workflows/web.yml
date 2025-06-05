@@ -30,4 +30,4 @@ jobs:
           aws-region: us-east-1
 
       - name: Upload all files to S3
-        run: aws s3 sync /web s3://app47captchademo/ --delete --exclude "*.DS_Store"
+        run: aws s3 sync web/ s3://app47captchademo/ --delete --exclude "*.DS_Store"
