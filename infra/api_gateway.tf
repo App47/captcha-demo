@@ -17,13 +17,13 @@ resource "aws_apigatewayv2_integration" "lambda_integration" {
 }
 
 resource "aws_apigatewayv2_route" "submit_route" {
-  api_id    = aws_apigatewayv2_api.api.id
+  api_id    = aws_apigatewayv2_api.demo.id
   route_key = "POST /submit"
   target    = "integrations/${aws_apigatewayv2_integration.lambda_integration.id}"
 }
 
 resource "aws_apigatewayv2_stage" "default" {
-  api_id      = aws_apigatewayv2_api.api.id
+  api_id      = aws_apigatewayv2_api.demo.id
   name        = "$default"
   auto_deploy = true
 }
@@ -39,7 +39,7 @@ resource "aws_apigatewayv2_domain_name" "custom_api_domain" {
 }
 
 resource "aws_apigatewayv2_api_mapping" "api_mapping" {
-  api_id      = aws_apigatewayv2_api.api.id
+  api_id      = aws_apigatewayv2_api.demo.id
   domain_name = aws_apigatewayv2_domain_name.custom_api_domain.domain_name
   stage       = aws_apigatewayv2_stage.default.name
 }
