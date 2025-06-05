@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Captcha Service – Email Form</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+      background-color: #f8f9fa;
+    }
+    form {
+      background: white;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    input[type="email"] {
+      padding: 0.5rem;
+      width: 100%;
+      margin-bottom: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    button {
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 4px;
+      background-color: #007bff;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <form action="https://captcha-demo-api.app47.net/submit" method="POST">
+    <label for="email">Email Address:</label><br />
+    <input type="email" id="email" name="email" required /><br />
+    <!-- CAPTCHA container -->
+    <cap-widget 
+       id="cap" 
+       data-cap-api-endpoint="https://captcha-demo-api.app47.net/"
+       data-cap-hidden-field-name="captcha-token">
+     </cap-widget>
+    <!-- Hidden input to carry proof -->
+    <input type="hidden" id="captcha-token" name="captchaToken">
+    <button type="submit">Submit</button>
+  </form>
+</body>
+<script>
+  const widget = document.querySelector("#cap");
+
+  widget.addEventListener("solve", function (e) {
+    const token = e.detail.token;
+    console.log("Token: " + token);
+  });
+</script>
+<script src="/cap.min.js"></script>
+</html>

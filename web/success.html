@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Password Reset Sent</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0fdf4;
+            color: #065f46;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            text-align: center;
+            background-color: #ecfdf5;
+            border: 1px solid #d1fae5;
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .icon {
+            width: 64px;
+            height: 64px;
+            margin-bottom: 1rem;
+        }
+        .message {
+            font-size: 1.25rem;
+            margin-bottom: 1.5rem;
+        }
+        .link-button {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            background-color: #10b981;
+            color: white;
+            text-decoration: none;
+            border-radius: 0.5rem;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        .link-button:hover {
+            background-color: #059669;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <svg class="icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+    </svg>
+    <div class="message">Success, password reset link has been sent in email!</div>
+    <a href="index.html" class="link-button">Back to Start</a>
+</div>
+</body>
+</html>
