@@ -1,12 +1,17 @@
-name: Deploy Web demo to S3
+name: Terraform Deploy
 
 on:
   push:
     branches:
       - main
+    paths:
+      - 'infra/*.tf'
+      - '.github/workflows/terraform.yml'
+
 
 jobs:
-  deploy:
+  terraform:
+    name: Apply Terraform
     runs-on: ubuntu-latest
 
     steps:
@@ -22,7 +27,6 @@ jobs:
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
-        working-directory: infra
 
       - name: Terraform Init
         run: terraform init
@@ -35,7 +39,3 @@ jobs:
       - name: Terraform Apply
         run: terraform apply -auto-approve
         working-directory: infra
-
-      - name: Upload all files to S3
-        run: aws s3 sync *.html s3://app47captchademo/ --delete --exclude "*.DS_Store"
-        working-directory: web
