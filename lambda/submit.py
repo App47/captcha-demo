@@ -29,7 +29,9 @@ def lambda_handler(event, context):
 
         print(f"Parsed email: {email} and token: {token}")
 
-         # Verify CAPTCHA token by calling your /validate endpoint
+         # Verify CAPTCHA token by calling the /validate endpoint
+         # In the future we will also include stronger authentication
+         # with this request to validate the token received from the form.
         data = json.dumps({"token": token}).encode("utf-8")
         req = urllib.request.Request(
             VALIDATE_URL,
@@ -49,8 +51,8 @@ def lambda_handler(event, context):
             }
         else:
             return {
-                        "statusCode": 302,
-                        "headers": {"Location": "https://captcha-demo.app47.net/error.html"}
+                "statusCode": 302,
+                "headers": {"Location": "https://captcha-demo.app47.net/error.html"}
                     }
 
     except Exception as e:

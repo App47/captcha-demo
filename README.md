@@ -8,3 +8,5 @@ The purpose of this repo is show a working example of the App47 Captcha Service 
 
 Along with a single lambda function that acts as the form handler for the static web site.
 * [submit.py](lambda/submit.py)
+
+This demo does not implement any strong security measures for starting the captcha process, but does highlight where that would plug in.
