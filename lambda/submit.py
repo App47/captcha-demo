@@ -2,7 +2,7 @@ import json
 import urllib.parse
 import urllib.request
 
-VALIDATE_URL = "https://captcha-demo-api.app47.net/validate"
+VALIDATE_URL = "https://captcha.app47.net/validate"
 # The purpose of this handler is to mimic what SFDC would need to do when the form is submitted. It is not meant
 # as a complete implementation, but it must check the format of the email and the validity of the token against the
 # captcha service.
