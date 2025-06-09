@@ -6,6 +6,7 @@ body {
     justify-content: center;
     height: 100vh;
     margin: 0;
+    font-size: x-large;
 }
 
 .container {
@@ -58,8 +59,12 @@ body {
     background-color: #ef4444;
 }
 
-.link-button:hover {
+.error .link-button:hover {
     background-color: #ef4444;
+}
+
+.success .link-button:hover {
+    background-color: #059669;
 }
 
 form {
@@ -91,6 +96,7 @@ button {
     background-color: #007bff;
     color: white;
     cursor: pointer;
+    font-weight: bold;
 }
 
 button:hover {
