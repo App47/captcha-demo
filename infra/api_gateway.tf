@@ -2,7 +2,7 @@ resource "aws_apigatewayv2_api" "demo" {
   name          = "CaptchaDemo"
   protocol_type = "HTTP"
   cors_configuration {
-    allow_origins     = ["https://captcha-demo.app47.net"]
+    allow_origins     = ["https://captcha-demo.app47.net", "https://gehealthcare-amer--dev1.sandbox.my.site.com"]
     allow_methods     = ["GET", "POST", "OPTIONS"]
     allow_headers     = ["Content-Type"]
   }
