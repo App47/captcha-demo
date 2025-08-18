@@ -1,0 +1,26 @@
+version: "3.9"
+services:
+  web:
+    build: .
+    image: rails-reset-demo:local
+    ports:
+      - "3000:3000"
+    environment:
+      RAILS_ENV: development
+      RACK_ENV: development
+      API_BASE_URL: http://mock-api:8080
+      JWT_ISSUER: "your-issuer"
+      JWT_AUDIENCE: "your-audience"
+      JWT_PRIVATE_KEY: |
+        -----BEGIN RSA PRIVATE KEY-----
+        your-dev-private-key
+        -----END RSA PRIVATE KEY-----
+    depends_on:
+      - mock-api
+  mock-api:
+    image: ghcr.io/wiremock/wiremock:3.6.0
+    command: ["--verbose"]
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./wiremock:/home/wiremock

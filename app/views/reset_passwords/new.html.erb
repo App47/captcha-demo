@@ -1,0 +1,27 @@
+<h1>Forgot your password?</h1>
+
+<% if flash[:notice] %>
+  <div class="flash notice"><%= flash[:notice] %></div>
+<% end %>
+<% if flash[:alert] %>
+  <div class="flash alert"><%= flash[:alert] %></div>
+<% end %>
+
+<% if @nonce.present? %>
+  <p>Enter your account email. We’ve initiated a secure flow.</p>
+
+  <%= form_with url: reset_passwords_path, method: :post, local: true do %>
+    <div>
+      <label for="email">Email</label>
+      <%= email_field_tag :email, nil, required: true, autocomplete: "email" %>
+    </div>
+
+    <%= hidden_field_tag :nonce, @nonce %>
+
+    <div style="margin-top: 1rem;">
+      <%= submit_tag "Verify and Continue" %>
+    </div>
+  <% end %>
+<% else %>
+  <p>We couldn’t start the reset flow right now. Please refresh and try again.</p>
+<% end %>

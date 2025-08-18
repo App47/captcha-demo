@@ -28,3 +28,4 @@ override.tf.json
 .idea/
 node_modules/
 package-lock.json
+vendor/
