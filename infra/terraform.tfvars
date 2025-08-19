@@ -20,3 +20,5 @@ cert_arn = "arn:aws:acm:us-east-1:883585999409:certificate/f5fc69c6-4b8c-441a-97
 image_url = "883585999409.dkr.ecr.us-east-1.amazonaws.com/app47/captcha-demo:latest"
 
 zone_id = "Z02768172R6QFAJA6KWK9" # Replace with the actual Hosted Zone ID for app47.net
+
+rails_master_key_arn = "arn:aws:ssm:us-east-1:883585999409:parameter/captcha-demo/rails_master_key"

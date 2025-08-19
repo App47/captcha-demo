@@ -12,7 +12,6 @@ variable "env_vars" {
   default = {
     RAILS_ENV       = "production"
     RACK_ENV        = "production"
-    SECRET_KEY_BASE = "5d0e55548d89eba4a9c9edb73f1087af"
   }
 }
 variable "zone_id" {
@@ -21,5 +20,10 @@ variable "zone_id" {
 
 variable "app_role_name" {
   description = "IAM role name used by the application"
+  type        = string
+}
+
+variable "rails_master_key_arn" {
+  description = "ARN for the Rails Master Key"
   type        = string
 }

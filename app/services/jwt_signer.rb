@@ -3,22 +3,51 @@ require "securerandom"
 require "openssl"
 
 class JwtSigner
-  def initialize(issuer: ENV["JWT_ISSUER"], audience: ENV["JWT_AUDIENCE"], private_key_pem: ENV["JWT_PRIVATE_KEY"])
-    @issuer = issuer
-    @audience = audience
-    @private_key = OpenSSL::PKey::RSA.new(private_key_pem.to_s)
+  def sign(additional_claims = {})
+    header = {
+      alg: 'ES256',
+      typ: 'JWT',
+      kid: kid
+    }
+    payload = {
+      iss: issuer,
+      aud: audience,
+      iat: Time.now.to_i,
+    }.merge(additional_claims)
+    puts header.inspect
+    puts payload.inspect
+    JWT.encode(payload, private_key, 'ES256', header)
   end
 
-  def sign(additional_claims = {}, exp_seconds: 60)
-    now = Time.now.to_i
-    payload = {
-      iss: @issuer,
-      aud: @audience,
-      iat: now,
-      exp: now + exp_seconds,
-      jti: SecureRandom.uuid
-    }.merge(additional_claims)
+  private
+  
+  def issuer
+    @issuer ||= jwt_secrets.issuer
+  end
+  
+  def audience
+    @audience ||= jwt_secrets.audience
+  end
+  
+  def private_key
+    return @private_key if defined?(@private_key)
 
-    JWT.encode(payload, @private_key, "RS256")
+    pem = jwt_secrets.private_key_pem
+    # Allow "\n" escaped newlines often used in env vars
+    # pem = pem.gsub("\\n", "\n")
+    # OpenSSL::PKey.read auto-detects EC/RSA; we need EC for ES256
+    key = OpenSSL::PKey.read(pem)
+    unless key.is_a?(OpenSSL::PKey::EC)
+      raise ArgumentError, "JWT_PRIVATE_KEY must be an EC key for ES256"
+    end
+    @private_key = key
+  end
+  
+  def kid
+    @kid ||= jwt_secrets.kid
+  end
+
+  def jwt_secrets
+    @jwt_secrets ||= Rails.application.credentials.jwt
   end
 end

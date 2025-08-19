@@ -1,6 +1,8 @@
 require "active_support/core_ext/integer/time"
 
 Rails.application.configure do
+  config.session_store :cookie_store, secure: true
+
   # Cache classes and eager load for performance.
   config.cache_classes = true
   config.eager_load = true
@@ -23,15 +25,16 @@ Rails.application.configure do
   # Enable by setting FORCE_SSL=true
   config.force_ssl = ENV["FORCE_SSL"] == "true"
 
-  # Logging to STDOUT for ECS/CloudWatch
-  config.log_level = (ENV["RAILS_LOG_LEVEL"] || "info").to_sym
-  logger           = ActiveSupport::Logger.new($stdout)
-  logger.formatter = ::Logger::Formatter.new
-  config.logger    = ActiveSupport::TaggedLogging.new(logger)
-  config.log_tags  = [:request_id]
+  # Logging to STDOUT for AWS collectors (ECS/EKS/EB/CloudWatch Agent)
+  config.log_level     = (ENV["RAILS_LOG_LEVEL"] || "info").to_sym
+  config.log_tags      = [:request_id, :remote_ip]
+  config.colorize_logging = false
+  config.log_formatter = ::Logger::Formatter.new
+
+  logger = ActiveSupport::Logger.new($stdout, level: config.log_level)
 
   # Caching
-  config.action_controller.perform_caching = true
+  config.action_controller.perform_caching = false
   config.cache_store = :memory_store
 
   # Internationalization fallbacks

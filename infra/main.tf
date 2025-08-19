@@ -135,19 +135,15 @@ resource "aws_ecs_task_definition" "captcha_demo" {
         { containerPort = 3000, hostPort = 3000 }
       ],
       environment = [
-        { name = "RAILS_ENV",             value = "production" },
-        { name = "RACK_ENV",              value = "production" },
-        { name = "RAILS_LOG_TO_STDOUT",   value = "true" },
+        { name = "RAILS_ENV", value = "production" },
+        { name = "RACK_ENV", value = "production" },
+        { name = "RAILS_LOG_TO_STDOUT", value = "true" },
         { name = "RAILS_SERVE_STATIC_FILES", value = "true" }
       ],
       secrets = [
         {
-          name      = "SECRET_KEY_BASE",
-          valueFrom = aws_ssm_parameter.secret_key_base.arn
-        },
-        {
           name      = "RAILS_MASTER_KEY",
-          valueFrom = aws_ssm_parameter.secret_key_base.arn
+          valueFrom = var.rails_master_key_arn
         }
       ],
       logConfiguration = {

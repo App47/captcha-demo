@@ -1,23 +1,15 @@
 require "faraday"
 require "json"
 
-class ApiClient
-  API_TIMEOUT = 5
-
-  def initialize(base_url: ENV["API_BASE_URL"])
-    @base_url = base_url.to_s.sub(%r{\/+$}, "") # trim trailing slash
-  end
+class CaptchaClient
+  API_TIMEOUT = 10
 
   def fetch_nonce
-    token = signer.sign({ purpose: "nonce" }, exp_seconds: 30)
+    token = signer.sign
 
     conn = faraday
-    res = conn.get("#{@base_url}/nonce") do |req|
-      req.headers["Authorization"] = "Bearer #{token}"
-      req.headers["Accept"] = "application/json"
-    end
-
-    raise "Nonce HTTP #{res.status}" unless res.success?
+    res = conn.get(captcha_api_url(:nonce, token))
+    raise "Nonce Request #{res.status}" unless res.success?
 
     json = JSON.parse(res.body) rescue {}
     json["nonce"] || raise("Nonce missing in response")
@@ -42,6 +34,14 @@ class ApiClient
 
   private
 
+  def captcha_api_url(endpoint, jwt)
+    "#{captcha_api}/#{endpoint}?jwt=#{jwt}"
+  end
+
+  def captcha_api
+    @captcha_api ||= Rails.application.credentials.jwt.api_url
+  end
+
   def signer
     @signer ||= JwtSigner.new
   end
@@ -50,7 +50,7 @@ class ApiClient
     @faraday ||= Faraday.new(request: { timeout: API_TIMEOUT, open_timeout: API_TIMEOUT }) do |f|
       # Lightweight resilience
       f.request :retry,
-                max: 2,
+                max: 4,
                 interval: 0.25,
                 backoff_factor: 2,
                 retry_statuses: [429, 500, 502, 503, 504]

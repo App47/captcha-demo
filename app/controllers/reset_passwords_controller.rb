@@ -1,11 +1,11 @@
 class ResetPasswordsController < ApplicationController
   def new
-    client = ApiClient.new
-    @nonce = client.fetch_nonce
-  rescue => e
-    Rails.logger.error("Nonce fetch failed: #{e.class} - #{e.message}")
+    client = CaptchaClient.new
+    @jwt_token = signer.sign({nonce: client.fetch_nonce})
+  rescue => error
+    Rails.logger.error("Nonce fetch failed: #{error.class} - #{error.message}")
     flash.now[:alert] = "Unable to start reset flow. Please try again."
-    @nonce = nil
+    @jwt_token = nil
   end
 
   def create
@@ -18,7 +18,7 @@ class ResetPasswordsController < ApplicationController
       return
     end
 
-    client = ApiClient.new
+    client = CaptchaClient.new
     verified = client.verify_reset(email: email, nonce: nonce)
 
     if verified
@@ -29,5 +29,11 @@ class ResetPasswordsController < ApplicationController
   rescue => e
     Rails.logger.error("Verification failed: #{e.class} - #{e.message}")
     redirect_to new_reset_password_path, alert: "An error occurred. Please try again."
+  end
+
+  private
+
+  def signer
+    @signer ||= JwtSigner.new
   end
 end
