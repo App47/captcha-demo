@@ -1,0 +1,22 @@
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-sm-12 col-md-6 offset-md-3">
+      <div class="card mt-2 bg-success text-white">
+        <div class="card-header">
+          <h1>SUCESS!! Password Reset</h1>
+        </div>
+        <div class="card-body">
+          <p>Your password has been reset using the following values:</p>
+          <ul>
+            <li><b>Email:</b><%= @email %></li>
+            <li><b>Nonce:</b><%= @nonce %></li>
+            <li><b>Token:</b><%= @token %></li>
+          </ul>
+        </div>
+        <div class="card-footer">
+          <a class='btn btn-primary' href="/">Reset a new password...</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -85,7 +85,7 @@ resource "aws_lb_target_group" "captcha_demo" {
   target_type = "ip"
 
   health_check {
-    path                = "/"
+    path                = "/health_check"
     protocol            = "HTTP"
     interval            = 30
     timeout             = 5

@@ -15,21 +15,15 @@ class CaptchaClient
     json["nonce"] || raise("Nonce missing in response")
   end
 
-  def verify_reset(email:, nonce:)
-    token = signer.sign({ purpose: "verify", email: email, nonce: nonce }, exp_seconds: 60)
+  def verify_reset!(token:, nonce:)
+    jwt_token = signer.sign({ token: token, nonce: nonce })
 
     conn = faraday
-    res = conn.post("#{@base_url}/verify") do |req|
-      req.headers["Authorization"] = "Bearer #{token}"
-      req.headers["Content-Type"] = "application/json"
-      req.headers["Accept"] = "application/json"
-      req.body = JSON.dump({ email: email, nonce: nonce })
+    res = conn.get(captcha_api_url(:validate, jwt_token))
+    unless res.success?
+      json = JSON.parse(res.body)
+      raise json['message']
     end
-
-    return false unless res.success?
-
-    json = JSON.parse(res.body) rescue {}
-    json["success"] == true
   end
 
   private

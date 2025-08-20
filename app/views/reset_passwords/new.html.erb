@@ -10,16 +10,16 @@
             <% if @jwt_token.present? %>
               <p>Enter your account email. We’ve initiated a secure flow.</p>
 
-              <div>
+              <div class="mb-2">
                 <label class="form-label" for="email">Email</label>
                 <%= email_field_tag :email, nil, required: true, autocomplete: "email", class: "form-control" %>
               </div>
 
               <cap-widget id="cap"
                           data-cap-api-endpoint="<%= Rails.application.credentials.jwt.api_url %>"
-                          data-cap-token-field-name='captcha-token'
-                          data-cap-nonce-field-name='captcha-nonce'
-                          data-cap-jwt-token=@jwt_token></cap-widget>
+                          data-cap-token-field-name='cap-token'
+                          data-cap-nonce-field-name='cap-nonce'
+                          data-cap-jwt-token=<%= @jwt_token %>></cap-widget>
             <% else %>
               <p>We couldn’t start the password reset flow right now. Please refresh and try again.</p>
             <% end %>

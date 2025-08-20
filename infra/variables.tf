@@ -10,8 +10,8 @@ variable "desired_count" { default = 1 }
 variable "env_vars" {
   type = map(string)
   default = {
-    RAILS_ENV       = "production"
-    RACK_ENV        = "production"
+    RAILS_ENV = "production"
+    RACK_ENV  = "production"
   }
 }
 variable "zone_id" {
