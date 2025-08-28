@@ -33,9 +33,6 @@ class JwtSigner
     return @private_key if defined?(@private_key)
 
     pem = jwt_secrets.private_key_pem
-    # Allow "\n" escaped newlines often used in env vars
-    # pem = pem.gsub("\\n", "\n")
-    # OpenSSL::PKey.read auto-detects EC/RSA; we need EC for ES256
     key = OpenSSL::PKey.read(pem)
     unless key.is_a?(OpenSSL::PKey::EC)
       raise ArgumentError, "JWT_PRIVATE_KEY must be an EC key for ES256"
