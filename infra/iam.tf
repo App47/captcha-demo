@@ -1,20 +1,50 @@
-resource "aws_iam_role" "lambda_exec" {
-  name = "demo_lambda_exec_role"
+provider "aws" {
+  alias  = "target"
+  region = var.aws_region
+  assume_role {
+    role_arn = "arn:aws:iam::883585999409:role/TerraformAdminRole"
+  }
+}
 
-  assume_role_policy = jsonencode({
+data "aws_iam_role" "app" {
+  provider = aws.target
+  name     = var.app_role_name
+}
+
+# Look up the ECS task execution role used in your task definition
+data "aws_iam_role" "ecs_execution" {
+  # If you use a different execution role name, update this to match.
+  name = "ecsTaskExecutionRole"
+}
+
+# Grant the execution role permission to read the Rails master key from SSM
+resource "aws_iam_policy" "ecs_exec_read_rails_master_key" {
+  name        = "EcsExecReadRailsMasterKey"
+  description = "Allow ECS task execution role to read Rails master key from SSM Parameter Store"
+  policy = jsonencode({
     Version = "2012-10-17",
-    Statement = [{
-      Action = "sts:AssumeRole",
-      Effect = "Allow",
-      Principal = {
-        Service = "lambda.amazonaws.com"
+    Statement = [
+      {
+        Sid    = "AllowGetRailsMasterKey",
+        Effect = "Allow",
+        Action = [
+          "ssm:GetParameter",
+          "ssm:GetParameters"
+        ],
+        Resource = var.rails_master_key_arn
       }
-    }]
+    ]
   })
 }
 
-resource "aws_iam_policy_attachment" "lambda_logs" {
-  name       = "lambda_logs"
-  roles      = [aws_iam_role.lambda_exec.name]
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+resource "aws_iam_role_policy_attachment" "ecs_exec_attach_read_master_key" {
+  role       = data.aws_iam_role.ecs_execution.name
+  policy_arn = aws_iam_policy.ecs_exec_read_rails_master_key.arn
 }
+
+# Remove this broad policy; it's not needed for ECS tasks and targets the wrong role.
+# resource "aws_iam_role_policy_attachment" "ecs_task_exec_ssm" {
+#   role       = aws_iam_role.ecs_task.name
+#   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+# }
+

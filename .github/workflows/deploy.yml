@@ -1,0 +1,74 @@
+name: Deploy to AWS
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  id-token: write   # for AWS OIDC
+  contents: read
+
+env:
+  AWS_REGION: ${{ secrets.AWS_REGION }}
+  AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+  ECR_REPOSITORY: app47/captcha-demo
+  IMAGE_TAG: ${{ github.sha }}
+  IMAGE_URI: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/app47/captcha-demo:${{ github.sha }}
+
+jobs:
+  deploy:
+    name: Build, push, and apply Terraform
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.TERRAFORM_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v2
+
+      # Option A: Use your build script (recommended if it already tags and pushes)
+      - name: Build and push with script
+        run: |
+          chmod +x bin/build_docker.sh
+          ./bin/build_docker.sh "${IMAGE_URI}"
+        # Ensure your script accepts the tag/uri and pushes to ECR.
+        # If it doesn't push, add `docker push "${IMAGE_URI}"` here.
+
+      # Option B: Inline Docker build/push (use this if your script doesn't push)
+      # - name: Build Docker image
+      #   run: docker build -t "${IMAGE_URI}" .
+      # - name: Push Docker image
+      #   run: docker push "${IMAGE_URI}"
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform init
+        working-directory: infra
+        run: terraform init
+
+      - name: Terraform validate
+        working-directory: infra
+        run: terraform validate
+
+      # We pass the new image URI to Terraform so the ECS task definition uses the new image.
+      - name: Terraform plan
+        working-directory: infra
+        env:
+          TF_VAR_image_url: ${{ env.IMAGE_URI }}
+        run: terraform plan -out=terraform.plan
+
+      - name: Terraform apply
+        if: github.ref == 'refs/heads/main'
+        working-directory: infra
+        env:
+          TF_VAR_image_url: ${{ env.IMAGE_URI }}
+        run: terraform apply -auto-approve terraform.plan

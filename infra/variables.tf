@@ -1,23 +1,29 @@
-variable "bucket_name" {
-  description = "S3 Bucket to host the demo web site"
-  type        = string
-  default     = "app47captchademo"
+variable "aws_region" { default = "us-east-1" }
+variable "vpc_id" { default = "vpc-80991be5" }
+variable "alb_subnet_ids" { type = list(string) }
+variable "ecs_subnet_ids" { type = list(string) }
+variable "cert_arn" {}
+variable "container_port" { default = 3000 }
+variable "image_url" {}
+variable "app_name" { default = "captcha-demo" }
+variable "desired_count" { default = 1 }
+variable "env_vars" {
+  type = map(string)
+  default = {
+    RAILS_ENV = "production"
+    RACK_ENV  = "production"
+  }
+}
+variable "zone_id" {
+  description = "Route 53 hosted zone ID for app47.net"
 }
 
-variable "aws_region" {
-  description = "AWS region"
+variable "app_role_name" {
+  description = "IAM role name used by the application"
   type        = string
-  default     = "us-east-1"
 }
 
-variable "route53_zone_id" {
-  description = "The Route53 zone ID for app47.net"
+variable "rails_master_key_arn" {
+  description = "ARN for the Rails Master Key"
   type        = string
-  default     = "Z02768172R6QFAJA6KWK9"
-}
-
-variable "app47_net_acm_arn" {
-  description = "The ARN for the App47.net ACM certficate"
-  type        = string
-  default     = "arn:aws:acm:us-east-1:883585999409:certificate/f5fc69c6-4b8c-441a-97b0-365996afbd8c"
 }
