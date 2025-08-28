@@ -4,7 +4,7 @@ ACCOUNT_ID="883585999409"
 REGION="us-east-1"
 REPO="app47/captcha-demo"
 ECR="${ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com"
-TAG="${GITHUB_SHA:-latest}"   # falls back to 'local' when run outside CI
+TAG="latest"   # falls back to 'local' when run outside CI
 IMAGE="${ECR}/${REPO}:${TAG}"
 
 aws ecr get-login-password --region "${REGION}" | docker login --username AWS --password-stdin "${ECR}"
@@ -18,7 +18,7 @@ docker buildx build \
   --push .
 
 # Optionally keep/update a 'latest' pointer
-docker buildx imagetools create -t "${ECR}/${REPO}:latest" "${IMAGE}"
+# docker buildx imagetools create -t "${ECR}/${REPO}:latest" "${IMAGE}"
 
 # Roll the service
 aws ecs update-service \
