@@ -6,15 +6,14 @@ on:
       - main
 
 permissions:
-  id-token: write   # for AWS OIDC
   contents: read
 
 env:
   AWS_REGION: ${{ secrets.AWS_REGION }}
   AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
   ECR_REPOSITORY: app47/captcha-demo
-  IMAGE_TAG: ${{ github.sha }}
-  IMAGE_URI: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/app47/captcha-demo:latest
+  IMAGE_TAG: latest
+  IMAGE_URI: ${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}
 
 jobs:
   deploy:
@@ -35,13 +34,10 @@ jobs:
       - name: Login to Amazon ECR
         uses: aws-actions/amazon-ecr-login@v2
 
-      # Option A: Use your build script (recommended if it already tags and pushes)
       - name: Build and push with script
         run: |
-          chmod +x scripts/build_docker.sh
-          ./scripts/build_docker.sh "${IMAGE_URI}"
-        # Ensure your script accepts the tag/uri and pushes to ECR.
-        # If it doesn't push, add `docker push "${IMAGE_URI}"` here.
+          docker buildx create --use >/dev/null 2>&1 || true
+          docker buildx build --platform linux/amd64 -t "${IMAGE_URI}" --push .
 
       # Option B: Inline Docker build/push (use this if your script doesn't push)
       # - name: Build Docker image
