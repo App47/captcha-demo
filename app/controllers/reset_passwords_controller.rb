@@ -16,10 +16,10 @@ class ResetPasswordsController < ApplicationController
 
     client = CaptchaClient.new
     client.verify_reset!(token: token, nonce: nonce)
-    render :success, email: email, nonce: nonce, token: token
+    render :success, locals: { email: email, nonce: nonce, token: token }
   rescue StandardError => error
     Rails.logger.error("Verification failed: #{error.class} - #{error.message}")
-    render :error, error_message: error.message
+    render :error, locals: { error_message: error.message }
   end
 
   private
