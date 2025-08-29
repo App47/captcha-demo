@@ -9,24 +9,88 @@ terraform {
 }
 
 provider "aws" {
-  region = "us-east-1"
+  region = var.aws_region
 }
 
+# ECS Task Role (assumed by your container)
 resource "aws_iam_role" "ecs_task" {
-  name = "demoTaskRole"
+  name = "${var.app_name}-task-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
     Statement = [
       {
-        Effect = "Allow",
-        Principal = {
-          Service = "ecs-tasks.amazonaws.com"
-        },
-        Action = "sts:AssumeRole"
+        Effect   = "Allow",
+        Principal = { Service = "ecs-tasks.amazonaws.com" },
+        Action   = "sts:AssumeRole"
       }
     ]
   })
+}
+
+# ECS Task Execution Role (pulls images from ECR, writes logs, fetches SSM secrets)
+resource "aws_iam_role" "ecs_task_execution" {
+  name = "${var.app_name}-execution-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect   = "Allow",
+        Principal = { Service = "ecs-tasks.amazonaws.com" },
+        Action   = "sts:AssumeRole"
+      }
+    ]
+  })
+}
+
+# Attach standard managed policy (ECR read + CloudWatch Logs)
+resource "aws_iam_role_policy_attachment" "ecs_task_execution_policy" {
+  role       = aws_iam_role.ecs_task_execution.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
+}
+
+# Allow execution role to read the Rails master key from SSM and decrypt with KMS
+resource "aws_iam_role_policy" "ecs_exec_ssm_kms" {
+  name = "${var.app_name}-exec-ssm-kms"
+  role = aws_iam_role.ecs_task_execution.id
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Sid      = "ReadRailsMasterKey",
+        Effect   = "Allow",
+        Action   = [
+          "ssm:GetParameter",
+          "ssm:GetParameters",
+          "ssm:GetParameterHistory"
+        ],
+        Resource = var.rails_master_key_arn
+      },
+      {
+        Sid      = "DecryptForSSMParameter",
+        Effect   = "Allow",
+        Action   = ["kms:Decrypt"],
+        Resource = "*",
+        Condition = {
+          StringEquals = {
+            "kms:ViaService" = "ssm.${var.aws_region}.amazonaws.com"
+          }
+        }
+      }
+    ]
+  })
+}
+
+# Create the ECR repository for this app (idempotent)
+resource "aws_ecr_repository" "captcha_demo" {
+  name                 = "app47/captcha-demo"
+  image_tag_mutability = "MUTABLE"
+
+  image_scanning_configuration {
+    scan_on_push = true
+  }
 }
 
 resource "aws_security_group" "alb" {
@@ -123,8 +187,8 @@ resource "aws_ecs_task_definition" "captcha_demo" {
   requires_compatibilities = ["FARGATE"]
   cpu                      = "512"
   memory                   = "1024"
-  execution_role_arn       = "arn:aws:iam::883585999409:role/ecsTaskExecutionRole"
-  task_role_arn            = "arn:aws:iam::883585999409:role/ecsTaskRole"
+  execution_role_arn       = aws_iam_role.ecs_task_execution.arn
+  task_role_arn            = aws_iam_role.ecs_task.arn
 
   container_definitions = jsonencode([
     {
@@ -150,7 +214,7 @@ resource "aws_ecs_task_definition" "captcha_demo" {
         logDriver = "awslogs",
         options = {
           awslogs-group         = "/ecs/captcha-demo",
-          awslogs-region        = "us-east-1",
+          awslogs-region        = var.aws_region,
           awslogs-stream-prefix = "captcha-demo"
         }
       }

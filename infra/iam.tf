@@ -6,17 +6,6 @@ provider "aws" {
   }
 }
 
-data "aws_iam_role" "app" {
-  provider = aws.target
-  name     = var.app_role_name
-}
-
-# Look up the ECS task execution role used in your task definition
-data "aws_iam_role" "ecs_execution" {
-  # If you use a different execution role name, update this to match.
-  name = "ecsTaskExecutionRole"
-}
-
 # Grant the execution role permission to read the Rails master key from SSM
 resource "aws_iam_policy" "ecs_exec_read_rails_master_key" {
   name        = "EcsExecReadRailsMasterKey"
@@ -38,7 +27,7 @@ resource "aws_iam_policy" "ecs_exec_read_rails_master_key" {
 }
 
 resource "aws_iam_role_policy_attachment" "ecs_exec_attach_read_master_key" {
-  role       = data.aws_iam_role.ecs_execution.name
+  role       = aws_iam_role.ecs_task_execution.id
   policy_arn = aws_iam_policy.ecs_exec_read_rails_master_key.arn
 }
 
