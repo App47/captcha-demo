@@ -17,8 +17,8 @@
 
               <cap-widget id="cap"
                           data-cap-api-endpoint="<%= Rails.application.credentials.jwt.api_url %>"
-                          data-cap-token-field-name='cap-token'
-                          data-cap-nonce-field-name='cap-nonce'
+                          data-cap-token-field-name='cap_token'
+                          data-cap-nonce-field-name='cap_nonce'
                           data-cap-jwt-token=<%= @jwt_token %>></cap-widget>
             <% else %>
               <p>We couldn’t start the password reset flow right now. Please refresh and try again.</p>

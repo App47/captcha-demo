@@ -9,14 +9,14 @@ class ResetPasswordsController < ApplicationController
   end
 
   def create
-    @email = params[:email].to_s.strip
-    @nonce = params[:cap_nonce].to_s
-    @token = params[:cap_token].to_s
-    raise 'Email, nonce and token are required' if @email.blank? || @nonce.blank? || @token.blank?
+    email = params[:email].to_s.strip
+    nonce = params[:cap_nonce].to_s
+    token = params[:cap_token].to_s
+    raise 'Email, nonce and token are required' if email.blank? || nonce.blank? || token.blank?
 
     client = CaptchaClient.new
-    client.verify_reset!(token: @token, nonce: @nonce)
-    render :success
+    client.verify_reset!(token: token, nonce: nonce)
+    render :success, email: email, nonce: nonce, token: token
   rescue StandardError => error
     Rails.logger.error("Verification failed: #{error.class} - #{error.message}")
     render :error, error_message: error.message
