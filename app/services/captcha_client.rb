@@ -5,31 +5,38 @@ class CaptchaClient
   API_TIMEOUT = 10
 
   def fetch_nonce
-    token = signer.sign
+    jwt_token = signer.sign
 
     conn = faraday
-    res = conn.get(captcha_api_url(:nonce, token))
+    res = conn.get(captcha_api_url(:nonce, jwt_token))
     raise "Nonce Request #{res.status}" unless res.success?
 
     json = JSON.parse(res.body) rescue {}
     json["nonce"] || raise("Nonce missing in response")
+  rescue StandardError => error
+    puts error.inspect
+    status = error.response&.dig(:status)
+    body   = error.response&.dig(:body).to_s
+    msg    = safe_error_message(body)
+    raise(msg.presence || "Nonce request failed#{status ? " (#{status})" : ""}")
   end
 
   def verify_reset!(token:, nonce:)
     jwt_token = signer.sign({ token: token, nonce: nonce })
 
     conn = faraday
-    res = conn.get(captcha_api_url(:validate, jwt_token))
-    unless res.success?
-      json = JSON.parse(res.body)
-      raise json['message']
-    end
+    conn.get(captcha_api_url(:validate, jwt_token))
+  rescue StandardError => error
+    status = error.response&.dig(:status)
+    body   = error.response&.dig(:body).to_s
+    msg    = safe_error_message(body)
+    raise(msg.presence || "Verification request failed#{status ? " (#{status})" : ""}")
   end
 
   private
 
   def captcha_api_url(endpoint, jwt)
-    "#{captcha_api}/#{endpoint}?jwt=#{jwt}"
+    "#{captcha_api}#{endpoint}?jwt=#{jwt}"
   end
 
   def captcha_api
@@ -54,4 +61,14 @@ class CaptchaClient
       f.adapter Faraday.default_adapter
     end
   end
+
+  def safe_error_message(body)
+    begin
+      parsed = JSON.parse(body)
+      parsed['message'] || parsed['error'] || body
+    rescue
+      body
+    end
+  end
+
 end
