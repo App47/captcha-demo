@@ -1,6 +1,6 @@
 resource "aws_route53_record" "captcha_demo" {
   zone_id = var.zone_id # You'll define this in variables.tf or .tfvars
-  name    = "captcha-demo.app47.net"
+  name    = var.fqdn_name
   type    = "A"
 
   alias {

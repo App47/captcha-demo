@@ -3,7 +3,7 @@ name: Deploy to AWS
 on:
   push:
     branches:
-      - main
+      - 'feature/*'
 
 permissions:
   contents: read
@@ -45,30 +45,30 @@ jobs:
         uses: hashicorp/setup-terraform@v3
 
       - name: Terraform init
-        working-directory: infra
+        working-directory: infra/staging
         run: terraform init
 
       - name: Terraform validate
-        working-directory: infra
+        working-directory: infra/staging
         run: terraform validate
 
       # We pass the new image URI to Terraform so the ECS task definition uses the new image.
       - name: Terraform plan
-        working-directory: infra
+        working-directory: infra/staging
         env:
           TF_VAR_image_url: ${{ env.IMAGE_URI }}
-        run: terraform plan -out=terraform.plan
+        run: terraform plan -out=staging.plan
 
       - name: Terraform apply
-        working-directory: infra
+        working-directory: infra/staging
         env:
           TF_VAR_image_url: ${{ env.IMAGE_URI }}
-        run: terraform apply -auto-approve terraform.plan
+        run: terraform apply -auto-approve staging.plan
 
       - name: Force ECS new deployment (only needed if reusing same tag)
         run: |
           aws ecs update-service \
-            --cluster captcha-demo-cluster \
-            --service captcha-demo-service \
+            --cluster staging-captcha-demo-cluster \
+            --service staging-captcha-service \
             --force-new-deployment \
             --region "${AWS_REGION}"
