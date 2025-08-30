@@ -69,6 +69,6 @@ jobs:
         run: |
           aws ecs update-service \
             --cluster staging-captcha-demo-cluster \
-            --service staging-captcha-service \
+            --service staging-captcha-demo-service \
             --force-new-deployment \
             --region "${AWS_REGION}"
