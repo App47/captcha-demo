@@ -25,7 +25,8 @@ class CaptchaClient
     jwt_token = signer.sign({ token: token, nonce: nonce })
 
     conn = faraday
-    conn.get(captcha_api_url(:validate, jwt_token))
+    res = conn.get(captcha_api_url(:validate, jwt_token))
+    raise "Verification Request #{res.status}" unless res.status == 204
   rescue StandardError => error
     status = error.response&.dig(:status)
     body   = error.response&.dig(:body).to_s
