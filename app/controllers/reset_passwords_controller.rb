@@ -5,6 +5,7 @@ class ResetPasswordsController < ApplicationController
   rescue StandardError => error
     Rails.logger.error("Nonce fetch failed: #{error.class} - #{error.message}")
     flash.now[:alert] = "Unable to start reset flow. Please try again."
+    flash.now[:warning] = error.message
     @jwt_token = nil
   end
 

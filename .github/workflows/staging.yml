@@ -1,0 +1,74 @@
+name: Deploy staging to AWS
+
+on:
+  push:
+    branches:
+      - 'feature/*'
+
+permissions:
+  contents: read
+
+env:
+  AWS_REGION: ${{ secrets.AWS_REGION }}
+  AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+  ECR_REPOSITORY: app47/captcha-demo
+  IMAGE_TAG: latest
+
+jobs:
+  deploy:
+    name: Build, push, and apply Terraform
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set IMAGE_URI
+        run: echo "IMAGE_URI=${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:${IMAGE_TAG}" >> "$GITHUB_ENV"
+
+      - name: Set up AWS CLI
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build and push image
+        run: |
+          docker buildx create --use >/dev/null 2>&1 || true
+          docker buildx build --platform linux/amd64 -t "${IMAGE_URI}" --push .
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform init
+        working-directory: infra/staging
+        run: terraform init
+
+      - name: Terraform validate
+        working-directory: infra/staging
+        run: terraform validate
+
+      # We pass the new image URI to Terraform so the ECS task definition uses the new image.
+      - name: Terraform plan
+        working-directory: infra/staging
+        env:
+          TF_VAR_image_url: ${{ env.IMAGE_URI }}
+        run: terraform plan -out=staging.plan
+
+      - name: Terraform apply
+        working-directory: infra/staging
+        env:
+          TF_VAR_image_url: ${{ env.IMAGE_URI }}
+        run: terraform apply -auto-approve staging.plan
+
+      - name: Force ECS new deployment (only needed if reusing same tag)
+        run: |
+          aws ecs update-service \
+            --cluster staging-captcha-demo-cluster \
+            --service staging-captcha-demo-service \
+            --force-new-deployment \
+            --region "${AWS_REGION}"
