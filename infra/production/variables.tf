@@ -7,13 +7,13 @@ variable "fqdn_name" {}
 variable "env_name" {}
 variable "container_port" { default = 3000 }
 variable "image_url" {}
-variable "app_name" { default = "staging-captcha-demo" }
+variable "app_name" { default = "production-captcha-demo" }
 variable "desired_count" { default = 1 }
 variable "env_vars" {
   type = map(string)
   default = {
-    RAILS_ENV = "staging"
-    RACK_ENV  = "staging"
+    RAILS_ENV = "production"
+    RACK_ENV  = "production"
   }
 }
 variable "zone_id" {
