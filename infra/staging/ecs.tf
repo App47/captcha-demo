@@ -66,19 +66,3 @@ resource "aws_ecs_service" "captcha_demo" {
   desired_count = 1
   depends_on    = [aws_lb_listener.https]
 }
-
-# Optional: HTTP listener to redirect to HTTPS
-resource "aws_lb_listener" "http_redirect" {
-  load_balancer_arn = aws_lb.captcha_demo.arn
-  port              = 80
-  protocol          = "HTTP"
-
-  default_action {
-    type = "redirect"
-    redirect {
-      port        = "443"
-      protocol    = "HTTPS"
-      status_code = "HTTP_301"
-    }
-  }
-}

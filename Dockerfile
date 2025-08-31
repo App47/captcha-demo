@@ -41,7 +41,6 @@ COPY . .
 
 # Precompile assets (when using sprockets/rollup/trix) — SECRET_KEY_BASE needed by Rails for some tasks
 # Use a dummy during build; real one is injected at runtime
-ENV SECRET_KEY_BASE_DUMMY=1
 #RUN bundle exec rake assets:precompile
 
 # -------- Runtime stage --------
