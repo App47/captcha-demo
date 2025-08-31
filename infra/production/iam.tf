@@ -1,11 +1,3 @@
-provider "aws" {
-  alias  = "target"
-  region = var.aws_region
-  assume_role {
-    role_arn = "arn:aws:iam::883585999409:role/TerraformAdminRole"
-  }
-}
-
 # Grant the execution role permission to read the Rails master key from SSM
 resource "aws_iam_policy" "ecs_exec_read_rails_master_key" {
   name        = "${var.env_name}-ecs-exec-read-rails-master-key"
