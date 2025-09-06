@@ -1112,7 +1112,7 @@ test:
 
 staging:
   <<: *default_settings
-  app_name: Captcha Demo (Staging)
+  app_name: Captcha Demo Staging
 
 production:
   <<: *default_settings
