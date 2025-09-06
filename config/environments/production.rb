@@ -25,13 +25,17 @@ Rails.application.configure do
   # Enable by setting FORCE_SSL=true
   config.force_ssl = ENV["FORCE_SSL"] == "true"
 
-  # Logging to STDOUT for AWS collectors (ECS/EKS/EB/CloudWatch Agent)
-  config.log_level     = (ENV["RAILS_LOG_LEVEL"] || "info").to_sym
-  config.log_tags      = [:request_id, :remote_ip]
-  config.colorize_logging = false
-  config.log_formatter = ::Logger::Formatter.new
+  # Ruby
+  config.log_level = :info
 
-  logger = ActiveSupport::Logger.new($stdout, level: config.log_level)
+  if ENV["RAILS_LOG_TO_STDOUT"].present?
+    base = ActiveSupport::Logger.new($stdout)
+    base.formatter = ::Logger::Formatter.new
+    config.logger = ActiveSupport::TaggedLogging.new(base)
+  end
+
+  $stdout.sync = true
+  $stderr.sync = true
 
   # Caching
   config.action_controller.perform_caching = false
