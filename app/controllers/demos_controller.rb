@@ -1,5 +1,5 @@
-class ResetPasswordsController < ApplicationController
-  def new
+class DemosController < ApplicationController
+  def show
     client = CaptchaClient.new
     @jwt_token = signer.sign({ nonce: client.fetch_nonce })
   rescue StandardError => error

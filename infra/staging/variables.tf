@@ -9,13 +9,7 @@ variable "container_port" { default = 3000 }
 variable "image_url" {}
 variable "app_name" { default = "staging-captcha-demo" }
 variable "desired_count" { default = 1 }
-variable "env_vars" {
-  type = map(string)
-  default = {
-    RAILS_ENV = "staging"
-    RACK_ENV  = "staging"
-  }
-}
+variable "version_tag" { default = "latest" }
 variable "zone_id" {
   description = "Route 53 hosted zone ID for app47.net"
 }

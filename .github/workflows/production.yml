@@ -66,12 +66,11 @@ jobs:
         working-directory: infra/production
         env:
           TF_VAR_image_url: ${{ env.IMAGE_URI }}
+          TF_VAR_version_tag: ${{ github.event.inputs.version_tag }}
         run: terraform plan -out=production.plan
 
       - name: Terraform apply
         working-directory: infra/production
-        env:
-          TF_VAR_image_url: ${{ env.IMAGE_URI }}
         run: terraform apply -auto-approve production.plan
 
       - name: Force ECS new deployment (only needed if reusing same tag)

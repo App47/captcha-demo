@@ -1,5 +1,6 @@
 Rails.application.routes.draw do
-  resource :reset_passwords, only: [:new, :create]
-  root to: "reset_passwords#new"
-  resource :health_check, only: [:show]
+  root to: "welcome#show"
+  resource :demo, only: %i[show create]
+  resource :welcome, only: :show
+  resource :health_check, only: :show
 end

@@ -1,7 +1,7 @@
-<div class="container-fluid min-vh-100 d-flex align-items-center">
+<div class="container min-vh-100 d-flex justify-content-center align-items-center">
   <div class="row justify-content-center w-100">
-    <div class="col-sm-12 col-md-6">
-      <%= form_with url: reset_passwords_path, method: :post, local: true do %>
+    <div class="col-sm-12 col-md-8 col-lg-6">
+      <%= form_with url: demo_path, method: :post, local: true do %>
         <div class="card mt-2">
           <div class="card-header">
             <h1>Forgot your password?</h1>
@@ -29,7 +29,7 @@
             <% if @jwt_token.present? %>
               <%= submit_tag "Verify and Continue", class: "btn btn-primary" %>
             <% else %>
-              <a class='btn btn-danger' href="/">Try again</a>
+              <a class='btn btn-danger' href="/demo">Try again</a>
             <% end %>
             <% if (switch = Rails.application.credentials.dig(:ui, :switch)) && switch[:name].present? && switch[:url].present? %>
               <%= link_to switch[:name], switch[:url], class: "btn btn-secondary", target: "_blank", rel: "noopener" %>
