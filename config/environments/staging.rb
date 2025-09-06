@@ -1,25 +1,29 @@
+require "active_support/core_ext/integer/time"
 
 Rails.application.configure do
-  # Settings specified here will take precedence over those in config/application.rb.
-
-  # In the development environment your application's code is reloaded on
-  # every request. This slows down response time but is perfect for development
-  # since you don't have to restart the web server when you make code changes.
   config.session_store :cookie_store, secure: true
-  config.cache_classes = true
 
-  # Do not eager load code on boot.
+  # Cache classes and eager load for performance.
+  config.cache_classes = true
   config.eager_load = true
 
-  # Configure redis cache
-  config.action_controller.perform_caching = false
-  config.cache_store = :memory_store
+  # Do not show full error reports in production.
+  config.consider_all_requests_local = false
 
-  # Show full error reports.
-  config.consider_all_requests_local = true
+  # Host allowlist: set a comma-separated list in RAILS_ALLOWED_HOSTS.
+  # Example: myapp.example.com,internal-alb-123.us-east-1.elb.amazonaws.com
+  allowed_hosts = ENV.fetch("RAILS_ALLOWED_HOSTS", "").split(",").map(&:strip).reject(&:empty?)
+  if allowed_hosts.any?
+    config.hosts.clear
+    allowed_hosts.each { |h| config.hosts << h }
+  end
 
-  # Print deprecation notices to the Rails logger.
-  config.active_support.deprecation = :silence
+  # Serve static files from the /public folder if env set (typical in containers).
+  config.public_file_server.enabled = ENV["RAILS_SERVE_STATIC_FILES"].present?
+
+  # Optional: force SSL if terminating at ALB and forwarding X-Forwarded-Proto.
+  # Enable by setting FORCE_SSL=true
+  config.force_ssl = ENV["FORCE_SSL"] == "true"
 
   # Ruby
   config.log_level = :info
@@ -33,17 +37,41 @@ Rails.application.configure do
   $stdout.sync = true
   $stderr.sync = true
 
-  # Setup content security policy
-  config.content_security_policy do |policy|
-    policy.default_src :none
-    policy.font_src    :self
-    policy.img_src     :self, 'data:'
-    policy.script_src  :self, 'https://js-agent.newrelic.com', 'https://bam.nr-data.net'
-    policy.style_src   :self, 'https://cdnjs.cloudflare.com'
-    policy.connect_src :self, 'https://bam.nr-data.net'
-    policy.child_src   :self
+  # Caching
+  config.action_controller.perform_caching = false
+  config.cache_store = :memory_store
+
+  # Internationalization fallbacks
+  config.i18n.fallbacks = true
+
+  # Don’t dump schema (no DB in this app, but harmless)
+  config.active_record.dump_schema_after_migration = false if defined?(ActiveRecord)
+
+  # Set a default headers baseline; you can customize CSP if needed.
+  # config.action_dispatch.default_headers = {
+  #   "X-Frame-Options" => "SAMEORIGIN",
+  #   "X-XSS-Protection" => "0",
+  #   "X-Content-Type-Options" => "nosniff"
+  # }
+
+  # Optional CORS (if you expose endpoints to browsers from another origin)
+  # Requires the rack-cors gem in your Gemfile (production group).
+  if ENV["ALLOWED_CORS_ORIGINS"].present?
+    origins = ENV["ALLOWED_CORS_ORIGINS"].split(",").map(&:strip)
+    config.middleware.insert_before 0, Rack::Cors do
+      allow do
+        origins origins
+        resource "*",
+                 headers: :any,
+                 methods: %i[get post options],
+                 expose: %w[Link],
+                 max_age: 600
+      end
+    end
   end
 
-  config.content_security_policy_nonce_generator = ->(request) { SecureRandom.base64(16) }
-  config.content_security_policy_nonce_directives = %w(script-src)
+  # Ensure SECRET_KEY_BASE is provided in production (required by Rails).
+  if Rails.application.credentials.secret_key_base.blank? && ENV["SECRET_KEY_BASE"].to_s.strip.empty?
+    warn "[config] SECRET_KEY_BASE is missing; set it in ENV or credentials."
+  end
 end
