@@ -7,12 +7,12 @@ gem "puma"
 gem "jwt"
 gem "faraday"
 gem "faraday-retry"
+gem "newrelic_rpm"
 
 group :development, :test do
   gem "dotenv-rails"
 end
 
 group :production do
-  gem "newrelic_rpm"
   gem "rack-cors"
 end
