@@ -52,17 +52,19 @@ jobs:
         working-directory: infra/staging
         run: terraform validate
 
+      - name: Generate timestamp tag
+        run: echo "VERSION_TAG=$(date +'%Y-%m-%d:%H:%M')" >> $GITHUB_ENV
+
       # We pass the new image URI to Terraform so the ECS task definition uses the new image.
       - name: Terraform plan
         working-directory: infra/staging
         env:
           TF_VAR_image_url: ${{ env.IMAGE_URI }}
+          TF_VAR_version_tag: ${{ env.VERSION_TAG }}
         run: terraform plan -out=staging.plan
 
       - name: Terraform apply
         working-directory: infra/staging
-        env:
-          TF_VAR_image_url: ${{ env.IMAGE_URI }}
         run: terraform apply -auto-approve staging.plan
 
       - name: Force ECS new deployment (only needed if reusing same tag)

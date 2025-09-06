@@ -1,0 +1,19 @@
+<div class="container min-vh-100 d-flex justify-content-center align-items-center">
+  <div class="row justify-content-center w-100">
+    <div class="col-sm-12 col-md-8 col-lg-6">
+      <div class="card">
+        <div class="card-header">
+          <h1>Welcome to the Captcha Demo!!</h1>
+        </div>
+        <div class="card-body">
+          <p>Welcome to the Captcha Demo site, if you are interested in learning more, please
+            <a href="https://app47.com/contact/">contact us</a> from our web site.</p>
+        </div>
+        <div class="card-footer d-flex justify-content-between">
+          <p><%= Rails.env.humanize %></p>
+          <p><%= env_var('VERSION_TAG', 'Latest') %></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

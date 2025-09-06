@@ -23,8 +23,11 @@ resource "aws_ecs_task_definition" "captcha_demo" {
       environment = [
         { name = "RAILS_ENV", value = var.env_name },
         { name = "RACK_ENV", value = var.env_name },
+        { name = "VERSION_TAG", value = var.version_tag },
         { name = "RAILS_LOG_TO_STDOUT", value = "true" },
-        { name = "RAILS_SERVE_STATIC_FILES", value = "true" }
+        { name = "RAILS_SERVE_STATIC_FILES", value = "true" },
+        { name = "NEW_RELIC_LOG", value = "stdout" },
+        { name = "NEW_RELIC_LOG_LEVEL", value = "debug" }
       ],
       secrets = [
         {
