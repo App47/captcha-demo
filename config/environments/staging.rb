@@ -13,20 +13,13 @@ Rails.application.configure do
 
   # Configure redis cache
   config.action_controller.perform_caching = false
-  config.cache_store = :redis_store, RedisConfiguration.load(11)
+  config.cache_store = :memory_store
 
-  # Don't care if the mailer can't send.
-  config.action_mailer.raise_delivery_errors = false
   # Show full error reports.
   config.consider_all_requests_local = true
-  config.action_mailer.perform_caching = false
 
   # Print deprecation notices to the Rails logger.
   config.active_support.deprecation = :silence
-
-  # Raises error for missing translations
-  # config.action_view.raise_on_missing_translations = true
-  config.public_file_server.enabled = true
 
   # Ruby
   config.log_level = :info
