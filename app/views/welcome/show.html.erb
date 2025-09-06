@@ -8,6 +8,7 @@
         <div class="card-body">
           <p>Welcome to the Captcha Demo site, if you are interested in learning more, please
             <a href="https://app47.com/contact/">contact us</a> from our web site.</p>
+          <p><%= Rails.application.credentials.new_relic_license_key %></p>
         </div>
         <div class="card-footer d-flex justify-content-between">
           <p><%= Rails.env.humanize %></p>
