@@ -9,7 +9,10 @@ variable "container_port" { default = 3000 }
 variable "image_url" {}
 variable "app_name" { default = "production-captcha-demo" }
 variable "desired_count" { default = 1 }
-variable "version_tag" { }
+variable "version_tag" {
+  description = "The version tag for the container image"
+  type        = string
+}
 variable "zone_id" {
   description = "Route 53 hosted zone ID for app47.net"
 }
