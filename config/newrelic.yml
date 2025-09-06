@@ -1116,3 +1116,4 @@ staging:
 
 production:
   <<: *default_settings
+  app_name: Captcha Demo Production
