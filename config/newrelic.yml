@@ -92,14 +92,14 @@ common: &default_settings
   # - "error"
   # - "fatal"
   # - "unknown"
-  # application_logging.forwarding.log_level: debug
+  application_logging.forwarding.log_level: warn
 
   # Defines the maximum number of log records to buffer in memory at a time.
   # application_logging.forwarding.max_samples_stored: 10000
 
   # If true, the agent decorates logs with metadata to link to entities, hosts,
   # traces, and spans.
-  # application_logging.local_decorating.enabled: false
+  application_logging.local_decorating.enabled: true
 
   # If true, the agent captures metrics related to logging for your application.
   # application_logging.metrics.enabled: true
@@ -1113,7 +1113,6 @@ test:
 staging:
   <<: *default_settings
   app_name: Captcha Demo (Staging)
-  log_level: debug
 
 production:
   <<: *default_settings
