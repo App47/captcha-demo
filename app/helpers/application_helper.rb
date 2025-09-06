@@ -7,7 +7,7 @@ module ApplicationHelper
   end
 
   def env_var(key, default = nil)
-    ENV[key].presence || default
+    ENV[key.to_s].presence || default
   rescue StandardError
     default
   end
