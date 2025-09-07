@@ -1113,7 +1113,13 @@ test:
 staging:
   <<: *default_settings
   app_name: Captcha Demo Staging
+  error_collector:
+    ignore_classes:
+      - ActionController::RoutingError
 
 production:
   <<: *default_settings
   app_name: Captcha Demo Production
+  error_collector:
+    ignore_classes:
+      - ActionController::RoutingError

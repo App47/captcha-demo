@@ -3,4 +3,5 @@ Rails.application.routes.draw do
   resource :demo, only: %i[show create]
   resource :welcome, only: :show
   resource :health_check, only: :show
+  match '*unmatched', to: 'errors#not_found', via: :all
 end

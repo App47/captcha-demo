@@ -26,7 +26,7 @@ Rails.application.configure do
   config.force_ssl = ENV["FORCE_SSL"] == "true"
 
   # Ruby
-  config.log_level = :info
+  config.log_level = :warn
 
   if ENV["RAILS_LOG_TO_STDOUT"].present?
     base = ActiveSupport::Logger.new($stdout)
