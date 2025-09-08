@@ -757,7 +757,7 @@ common: &default_settings
   # ignoring specific transactions.
   # rules.ignore_url_regexes: []
   rules:
-    ignore:
+    ignore_url_regexes:
       - ^/health_check$
   # Applies Language Agent Security Policy settings.
   # security_policies_token: ""
