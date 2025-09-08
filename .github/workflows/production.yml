@@ -72,11 +72,3 @@ jobs:
       - name: Terraform apply
         working-directory: infra/production
         run: terraform apply -auto-approve production.plan
-
-      - name: Force ECS new deployment (only needed if reusing same tag)
-        run: |
-          aws ecs update-service \
-            --cluster production-captcha-demo-cluster \
-            --service production-captcha-demo-service \
-            --force-new-deployment \
-            --region "${AWS_REGION}"
