@@ -10,7 +10,7 @@ on:
         description: 'Optional: image digest to promote (sha256:...) — takes precedence over source_tag'
         required: false
       version_tag:
-        description: 'Production version tag to create (e.g., v1.0.0)'
+        description: 'Production version tag to create (e.g., R20250908)'
         required: true
 
 permissions:
@@ -72,11 +72,3 @@ jobs:
       - name: Terraform apply
         working-directory: infra/production
         run: terraform apply -auto-approve production.plan
-
-      - name: Force ECS new deployment (only needed if reusing same tag)
-        run: |
-          aws ecs update-service \
-            --cluster production-captcha-demo-cluster \
-            --service production-captcha-demo-service \
-            --force-new-deployment \
-            --region "${AWS_REGION}"

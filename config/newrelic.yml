@@ -756,7 +756,9 @@ common: &default_settings
   # patterns matching the URI you want to ignore. For more detail, see the docs on
   # ignoring specific transactions.
   # rules.ignore_url_regexes: []
-
+  rules:
+    ignore_url_regexes:
+      - ^/health_check$
   # Applies Language Agent Security Policy settings.
   # security_policies_token: ""
 
