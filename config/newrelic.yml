@@ -413,7 +413,7 @@ common: &default_settings
 
   # A list of error classes that the agent should ignore.
   # This option can't be set via environment variable.
-  # error_collector.ignore_classes: ["ActionController::RoutingError", "Sinatra::NotFound"]
+  error_collector.ignore_classes: ["ActionController::RoutingError"]
 
   # A map of error classes to a list of messages. When an error of one of the
   # classes specified here occurs, if its error message contains one of the
@@ -423,7 +423,7 @@ common: &default_settings
 
   # A comma separated list of status codes, possibly including ranges. Errors
   # associated with these status codes, where applicable, will be ignored.
-  # error_collector.ignore_status_codes: ""
+  error_collector.ignore_status_codes: 404,410
 
   # Defines the maximum number of frames in an error backtrace. Backtraces over
   # this amount are truncated in the middle, preserving the beginning and the end
@@ -1115,13 +1115,7 @@ test:
 staging:
   <<: *default_settings
   app_name: Captcha Demo Staging
-  error_collector:
-    ignore_classes:
-      - ActionController::RoutingError
 
 production:
   <<: *default_settings
   app_name: Captcha Demo Production
-  error_collector:
-    ignore_classes:
-      - ActionController::RoutingError
