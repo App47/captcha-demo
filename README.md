@@ -2,6 +2,7 @@
 Hold the Captcha Demo for customers
 
 The purpose of this repo is show a working example of the App47 Captcha Service using a simple static web site:
+
 * [index.html](web/index.html)
 * [success.html](web/success.html)
 * [error.html](web/error.html)
@@ -48,9 +49,8 @@ Either as an embedded script, or in a javascript file, add the following script
 
 The second area to setup is to configure the validation end point. This will happen wherever the end point of the form is submitted. 
 While a working example can found in [submit.py](lambda/submit.py), the steps to write your own validation end point are listed below.
+
 1. Receive the form input and extract the captcha-token field from the form submission.
 2. Post the validation token in `application/json` to the end point `https://captcha.app47.net/validate`
 3. If the post is valid, you will get a http response `200` with a JSON payload.
 4. Verify the payload of `{'success': true}`
-
- 
