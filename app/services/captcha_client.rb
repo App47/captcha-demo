@@ -8,7 +8,7 @@ class CaptchaClient
     jwt_token = signer.sign
 
     conn = faraday
-    res = conn.get(captcha_api_url(:nonce, jwt_token))
+    res = conn.get(captcha_api_url(:nonce), headers: { "Authorization": jwt_token })
     raise "Nonce Request #{res.status}" unless res.success?
 
     json = JSON.parse(res.body) rescue {}
@@ -25,7 +25,7 @@ class CaptchaClient
     jwt_token = signer.sign({ token: token, nonce: nonce })
 
     conn = faraday
-    res = conn.get(captcha_api_url(:validate, jwt_token))
+    res = conn.get(captcha_api_url(:validate), headers: { "Authorization": jwt_token })
     raise "Verification Request #{res.status}" unless res.status == 204
   rescue StandardError => error
     status = error.response&.dig(:status)
@@ -36,8 +36,8 @@ class CaptchaClient
 
   private
 
-  def captcha_api_url(endpoint, jwt)
-    "#{captcha_api}#{endpoint}?jwt=#{jwt}"
+  def captcha_api_url(endpoint)
+    "#{captcha_api}#{endpoint}"
   end
 
   def captcha_api
