@@ -43,6 +43,7 @@ bin/rails credentials:edit --environment development
 bin/rails credentials:edit --environment test
 bin/rails credentials:edit --environment production
 ```
+
 - This decrypts to a temporary YAML file, opens your editor, and re-encrypts on save and exit.
 - If the .key file is missing, Rails will generate it for you.
 
@@ -77,6 +78,7 @@ bin/rails credentials:show --environment development
 ```
 
 Production and CI/CD: providing the key
+
 - In production, do NOT deploy the .key file with your app. Instead, set:
   - RAILS_MASTER_KEY for global credentials (config/credentials.yml.enc), or
   - RAILS_MASTER_KEY for per-environment credentials as well (Rails uses this for the current RAILS_ENV’s file).
@@ -87,6 +89,7 @@ Production and CI/CD: providing the key
   - From a secret manager (AWS SSM Parameter Store, Secrets Manager, Vault, etc.).
 
 Example: using AWS SSM Parameter Store for the key
+
 - Store the key at parameter name /myapp/rails_master_key.
 - Grant your runtime role permission to read it (ssm:GetParameter) and kms:Decrypt.
 - Inject into the container as env RAILS_MASTER_KEY via the task definition.
@@ -103,6 +106,7 @@ config/credentials/*.key
 ```
 
 Migrating from single to per-environment credentials
+
 - If you currently use config/credentials.yml.enc:
   - Create environment-specific credentials with the commands above.
   - Move entries into the appropriate per-env files.

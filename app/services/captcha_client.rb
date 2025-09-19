@@ -2,16 +2,15 @@ require "faraday"
 require "json"
 
 class CaptchaClient
-  API_TIMEOUT = 10
+  API_TIMEOUT = 20
 
   def fetch_nonce
     jwt_token = signer.sign
 
-    conn = faraday
-    res = conn.get(captcha_api_url(:nonce), {}, { "Authorization": jwt_token })
+    res = faraday.get(captcha_api_url(:nonce), {}, { "Authorization": jwt_token })
     raise "Nonce Request #{res.status}" unless res.success?
 
-    json = JSON.parse(res.body) rescue {}
+    json = JSON.parse(res.body)
     json["nonce"] || raise("Nonce missing in response")
   rescue StandardError => error
     puts error.inspect
@@ -24,8 +23,7 @@ class CaptchaClient
   def verify_reset!(token:, nonce:)
     jwt_token = signer.sign({ token: token, nonce: nonce })
 
-    conn = faraday
-    res = conn.get(captcha_api_url(:validate), {}, { "Authorization": jwt_token })
+    res = faraday.get(captcha_api_url(:validate), {}, { "Authorization": jwt_token })
     raise "Verification Request #{res.status}" unless res.status == 204
   rescue StandardError => error
     status = error.response&.dig(:status)
