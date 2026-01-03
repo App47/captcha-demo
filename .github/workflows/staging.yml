@@ -1,9 +1,9 @@
 name: Deploy staging to AWS
 
-on:
-  push:
-    branches:
-      - 'feature/*'
+# on:
+#   push:
+#     branches:
+#       - 'feature/*'
 
 permissions:
   contents: read
