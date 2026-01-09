@@ -49,8 +49,17 @@ resource "aws_ecs_service" "captcha_demo" {
   name                   = local.service_name
   cluster                = aws_ecs_cluster.captcha_demo.id
   task_definition        = aws_ecs_task_definition.captcha_demo.arn
-  launch_type            = "FARGATE"
   enable_execute_command = true
+
+  capacity_provider_strategy {
+    capacity_provider = "FARGATE_SPOT"
+    weight            = 1
+  }
+
+  capacity_provider_strategy {
+    capacity_provider = "FARGATE"
+    weight            = 1
+  }
 
   network_configuration {
     subnets          = var.ecs_subnet_ids
