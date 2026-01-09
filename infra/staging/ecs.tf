@@ -65,5 +65,5 @@ resource "aws_ecs_service" "captcha_demo" {
   }
 
   desired_count = 1
-  depends_on    = [aws_lb_listener.https]
+  depends_on    = [aws_lb_target_group.captcha_demo]
 }

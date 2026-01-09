@@ -21,3 +21,24 @@ variable "rails_master_key_arn" {
   description = "ARN for the Rails Master Key"
   type        = string
 }
+
+# --- Inputs from shared ALB stack ---
+variable "alb_https_listener_arn" {
+  type        = string
+  description = "HTTPS listener ARN on the shared ALB"
+}
+
+variable "alb_dns_name" {
+  type        = string
+  description = "DNS Name of the shared ALB"
+}
+
+variable "alb_dns_zone_id" {
+  type        = string
+  description = "DNS Zone ID of the shared ALB"
+}
+
+variable "alb_security_group_id" {
+  type        = string
+  description = "Security group ID for the shared ALB"
+}

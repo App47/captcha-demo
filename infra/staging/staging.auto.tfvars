@@ -20,3 +20,8 @@ image_url            = "883585999409.dkr.ecr.us-east-1.amazonaws.com/app47/captc
 zone_id              = "Z02768172R6QFAJA6KWK9"
 fqdn_name            = "captcha-demo.app47.net"
 rails_master_key_arn = "arn:aws:ssm:us-east-1:883585999409:parameter/captcha-demo/staging/rails_master_key"
+
+alb_https_listener_arn = "arn:aws:elasticloadbalancing:us-east-1:883585999409:listener/app/shared/32f3a57cd7684540/0cf3b168b8ae2d58"
+alb_security_group_id  = "sg-0dcfe0bea8517d329"
+alb_dns_name           = "shared-555384845.us-east-1.elb.amazonaws.com"
+alb_dns_zone_id        = "Z35SXDOTRQ7X7K"
