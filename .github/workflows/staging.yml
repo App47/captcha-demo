@@ -1,15 +1,16 @@
 name: Deploy staging to AWS
 
-# on:
-#   push:
-#     branches:
-#       - 'feature/*'
+on:
+  push:
+    branches:
+      - 'feature/*'
 
 permissions:
+  id-token: write
   contents: read
 
 env:
-  AWS_REGION: ${{ secrets.AWS_REGION }}
+  AWS_REGION: us-east-1
   AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
   ECR_REPOSITORY: app47/captcha-demo
   IMAGE_TAG: latest
@@ -26,12 +27,11 @@ jobs:
       - name: Set IMAGE_URI
         run: echo "IMAGE_URI=${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:${IMAGE_TAG}" >> "$GITHUB_ENV"
 
-      - name: Set up AWS CLI
-        uses: aws-actions/configure-aws-credentials@v4
+      - name: Set up AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v5
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
+          role-to-assume: arn:aws:iam::883585999409:role/GH_CICD
+          aws-region: us-east-1
 
       - name: Login to Amazon ECR
         uses: aws-actions/amazon-ecr-login@v2

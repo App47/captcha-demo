@@ -4,8 +4,8 @@ resource "aws_route53_record" "captcha_demo" {
   type    = "A"
 
   alias {
-    name                   = aws_lb.captcha_demo.dns_name
-    zone_id                = aws_lb.captcha_demo.zone_id
+    name                   = var.alb_dns_name
+    zone_id                = var.alb_dns_zone_id
     evaluate_target_health = false
   }
 }

@@ -7,9 +7,9 @@ resource "aws_lb_target_group" "captcha_demo" {
   target_type = "ip"
 
   health_check {
-    path                = "/status.txt" # per your standard
+    path                = "/health_check" # per your standard
     protocol            = "HTTP"
-    interval            = 30
+    interval            = 40
     timeout             = 5
     healthy_threshold   = 2
     unhealthy_threshold = 2
@@ -20,7 +20,7 @@ resource "aws_lb_target_group" "captcha_demo" {
 # Host-based routing on shared ALB listener
 resource "aws_lb_listener_rule" "captcha_demo_host" {
   listener_arn = var.alb_https_listener_arn
-  priority     = 30 # choose a unique priority across all rules on the listener
+  priority     = 45 # choose a unique priority across all rules on the listener
 
   condition {
     host_header {
