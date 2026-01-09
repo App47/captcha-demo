@@ -54,11 +54,13 @@ resource "aws_ecs_service" "captcha_demo" {
   capacity_provider_strategy {
     capacity_provider = "FARGATE_SPOT"
     weight            = 1
+    base              = 0
   }
 
   capacity_provider_strategy {
     capacity_provider = "FARGATE"
-    weight            = 1
+    weight            = 0
+    base              = 0
   }
 
   network_configuration {
