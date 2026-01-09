@@ -15,6 +15,7 @@ on:
 
 permissions:
   contents: read
+  id-token: write
 
 env:
   AWS_REGION: ${{ secrets.AWS_REGION }}
@@ -33,7 +34,8 @@ jobs:
       - name: Set IMAGE_URI
         run: echo "IMAGE_URI=${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:${{ github.event.inputs.version_tag }}" >> "$GITHUB_ENV"
 
-      - name: Set up AWS CLI
+      - name: Set up AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v5
         with:
           role-to-assume: arn:aws:iam::883585999409:role/GH_CICD
           aws-region: us-east-1

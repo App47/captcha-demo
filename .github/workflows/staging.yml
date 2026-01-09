@@ -27,7 +27,7 @@ jobs:
       - name: Set IMAGE_URI
         run: echo "IMAGE_URI=${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:${IMAGE_TAG}" >> "$GITHUB_ENV"
 
-      - name: Set up AWS CLI
+      - name: Set up AWS Credentials
         uses: aws-actions/configure-aws-credentials@v5
         with:
           role-to-assume: arn:aws:iam::883585999409:role/GH_CICD
