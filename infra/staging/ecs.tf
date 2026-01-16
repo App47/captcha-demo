@@ -50,16 +50,17 @@ resource "aws_ecs_service" "captcha_demo" {
   cluster                = aws_ecs_cluster.captcha_demo.id
   task_definition        = aws_ecs_task_definition.captcha_demo.arn
   enable_execute_command = true
+#  launch_type            = "FARGATE"
 
   capacity_provider_strategy {
     capacity_provider = "FARGATE_SPOT"
-    weight            = 1
+    weight            = 10
     base              = 0
   }
 
   capacity_provider_strategy {
     capacity_provider = "FARGATE"
-    weight            = 0
+    weight            = 1
     base              = 0
   }
 
