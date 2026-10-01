@@ -6,6 +6,10 @@ resource "aws_lb_target_group" "captcha_demo" {
   vpc_id      = var.vpc_id
   target_type = "ip"
 
+  tags = {
+    Role = "tg"
+  }
+
   health_check {
     path                = "/health_check" # per your standard
     protocol            = "HTTP"
@@ -21,6 +25,10 @@ resource "aws_lb_target_group" "captcha_demo" {
 resource "aws_lb_listener_rule" "captcha_demo_host" {
   listener_arn = var.alb_https_listener_arn
   priority     = 45 # choose a unique priority across all rules on the listener
+
+  tags = {
+    Role = "listener-rule"
+  }
 
   condition {
     host_header {

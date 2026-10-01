@@ -12,6 +12,5 @@ locals {
   svc_sg_name                  = "${local.name_prefix}-ecs-sg"
   ecs_task_name                = "${local.name_prefix}-task-role"
   ecs_task_execution           = "${local.name_prefix}-execution-role"
-  ecs_kms_name                 = "${local.name_prefix}-ssm-kms"
   rails_master_key_policy_name = "${local.name_prefix}-rails-master-key"
 }
