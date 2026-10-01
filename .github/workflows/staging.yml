@@ -70,7 +70,7 @@ jobs:
       - name: Force ECS new deployment (only needed if reusing same tag)
         run: |
           aws ecs update-service \
-            --cluster staging-captcha-demo-cluster \
-            --service staging-captcha-demo-service \
+            --cluster captcha-demo-staging-cluster \
+            --service captcha-demo-staging-service \
             --force-new-deployment \
             --region "${AWS_REGION}"
