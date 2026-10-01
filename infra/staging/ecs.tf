@@ -1,6 +1,10 @@
 
 resource "aws_ecs_cluster" "captcha_demo" {
   name = local.cluster_name
+
+  tags = {
+    Role = "cluster"
+  }
 }
 
 resource "aws_ecs_task_definition" "captcha_demo" {
@@ -11,6 +15,10 @@ resource "aws_ecs_task_definition" "captcha_demo" {
   memory                   = "1024"
   execution_role_arn       = aws_iam_role.ecs_task_execution.arn
   task_role_arn            = aws_iam_role.ecs_task.arn
+
+  tags = {
+    Role = "task"
+  }
 
   container_definitions = jsonencode([
     {
@@ -50,7 +58,12 @@ resource "aws_ecs_service" "captcha_demo" {
   cluster                = aws_ecs_cluster.captcha_demo.id
   task_definition        = aws_ecs_task_definition.captcha_demo.arn
   enable_execute_command = true
+  propagate_tags         = "SERVICE"
   #  launch_type            = "FARGATE"
+
+  tags = {
+    Role = "service"
+  }
 
   capacity_provider_strategy {
     capacity_provider = "FARGATE_SPOT"

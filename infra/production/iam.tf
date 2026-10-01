@@ -2,6 +2,10 @@
 resource "aws_iam_policy" "ecs_exec_read_rails_master_key" {
   name        = local.rails_master_key_policy_name
   description = "Allow ECS task execution role to read Rails master key from SSM Parameter Store"
+
+  tags = {
+    Role = "rails-master-key"
+  }
   policy = jsonencode({
     Version = "2012-10-17",
     Statement = [
@@ -28,6 +32,10 @@ resource "aws_iam_role_policy_attachment" "ecs_exec_attach_read_master_key" {
 resource "aws_iam_role" "ecs_task" {
   name = local.ecs_task_name
 
+  tags = {
+    Role = "task-role"
+  }
+
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
     Statement = [
@@ -43,6 +51,10 @@ resource "aws_iam_role" "ecs_task" {
 # ECS Task Execution Role (pulls images from ECR, writes logs, fetches SSM secrets)
 resource "aws_iam_role" "ecs_task_execution" {
   name = local.ecs_task_execution
+
+  tags = {
+    Role = "execution-role"
+  }
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17",

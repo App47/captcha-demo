@@ -7,7 +7,6 @@ variable "fqdn_name" {}
 variable "env_name" {}
 variable "container_port" { default = 3000 }
 variable "image_url" {}
-variable "app_name" { default = "staging-captcha-demo" }
 variable "desired_count" { default = 1 }
 variable "version_tag" {
   description = "The version tag for the container image"
