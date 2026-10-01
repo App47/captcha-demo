@@ -59,7 +59,6 @@ resource "aws_ecs_service" "captcha_demo" {
   task_definition        = aws_ecs_task_definition.captcha_demo.arn
   enable_execute_command = true
   propagate_tags         = "SERVICE"
-  #  launch_type            = "FARGATE"
 
   tags = {
     Role = "service"

@@ -14,9 +14,21 @@ resource "aws_iam_policy" "ecs_exec_read_rails_master_key" {
         Effect = "Allow",
         Action = [
           "ssm:GetParameter",
-          "ssm:GetParameters"
+          "ssm:GetParameters",
+          "ssm:GetParameterHistory"
         ],
         Resource = var.rails_master_key_arn
+      },
+      {
+        Sid      = "DecryptForSSMParameter",
+        Effect   = "Allow",
+        Action   = ["kms:Decrypt"],
+        Resource = "*",
+        Condition = {
+          StringEquals = {
+            "kms:ViaService" = "ssm.${var.aws_region}.amazonaws.com"
+          }
+        }
       }
     ]
   })
@@ -72,37 +84,4 @@ resource "aws_iam_role" "ecs_task_execution" {
 resource "aws_iam_role_policy_attachment" "ecs_task_execution_policy" {
   role       = aws_iam_role.ecs_task_execution.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
-}
-
-# Allow execution role to read the Rails master key from SSM and decrypt with KMS
-resource "aws_iam_role_policy" "ecs_exec_ssm_kms" {
-  name = local.ecs_kms_name
-  role = aws_iam_role.ecs_task_execution.id
-
-  policy = jsonencode({
-    Version = "2012-10-17",
-    Statement = [
-      {
-        Sid    = "ReadRailsMasterKey",
-        Effect = "Allow",
-        Action = [
-          "ssm:GetParameter",
-          "ssm:GetParameters",
-          "ssm:GetParameterHistory"
-        ],
-        Resource = var.rails_master_key_arn
-      },
-      {
-        Sid      = "DecryptForSSMParameter",
-        Effect   = "Allow",
-        Action   = ["kms:Decrypt"],
-        Resource = "*",
-        Condition = {
-          StringEquals = {
-            "kms:ViaService" = "ssm.${var.aws_region}.amazonaws.com"
-          }
-        }
-      }
-    ]
-  })
 }
