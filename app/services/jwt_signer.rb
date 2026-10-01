@@ -35,7 +35,7 @@ class JwtSigner
     pem = jwt_secrets.private_key_pem
     key = OpenSSL::PKey.read(pem)
     unless key.is_a?(OpenSSL::PKey::EC)
-      raise ArgumentError, "JWT_PRIVATE_KEY must be an EC key for ES256"
+      raise ArgumentError, "jwt.private_key_pem must be an EC key for ES256"
     end
     @private_key = key
   end

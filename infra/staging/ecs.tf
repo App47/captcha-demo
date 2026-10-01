@@ -1,10 +1,14 @@
 
 resource "aws_ecs_cluster" "captcha_demo" {
   name = local.cluster_name
+
+  tags = {
+    Role = "cluster"
+  }
 }
 
 resource "aws_ecs_task_definition" "captcha_demo" {
-  family                   = var.app_name
+  family                   = local.task_family
   network_mode             = "awsvpc"
   requires_compatibilities = ["FARGATE"]
   cpu                      = "512"
@@ -12,9 +16,13 @@ resource "aws_ecs_task_definition" "captcha_demo" {
   execution_role_arn       = aws_iam_role.ecs_task_execution.arn
   task_role_arn            = aws_iam_role.ecs_task.arn
 
+  tags = {
+    Role = "task"
+  }
+
   container_definitions = jsonencode([
     {
-      name      = var.app_name,
+      name      = local.container_name,
       image     = var.image_url,
       essential = true,
       portMappings = [
@@ -38,7 +46,7 @@ resource "aws_ecs_task_definition" "captcha_demo" {
         options = {
           awslogs-group         = local.log_group_name,
           awslogs-region        = var.aws_region,
-          awslogs-stream-prefix = var.app_name
+          awslogs-stream-prefix = local.container_name
         }
       }
     }
@@ -50,7 +58,11 @@ resource "aws_ecs_service" "captcha_demo" {
   cluster                = aws_ecs_cluster.captcha_demo.id
   task_definition        = aws_ecs_task_definition.captcha_demo.arn
   enable_execute_command = true
-#  launch_type            = "FARGATE"
+  propagate_tags         = "SERVICE"
+
+  tags = {
+    Role = "service"
+  }
 
   capacity_provider_strategy {
     capacity_provider = "FARGATE_SPOT"
@@ -72,7 +84,7 @@ resource "aws_ecs_service" "captcha_demo" {
 
   load_balancer {
     target_group_arn = aws_lb_target_group.captcha_demo.arn
-    container_name   = var.app_name
+    container_name   = local.container_name
     container_port   = 3000
   }
 

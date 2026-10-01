@@ -14,7 +14,6 @@ ecs_subnet_ids = [
 ]
 
 env_name             = "staging"
-app_name             = "staging-captcha-demo"
 cert_arn             = "arn:aws:acm:us-east-1:883585999409:certificate/f5fc69c6-4b8c-441a-97b0-365996afbd8c"
 image_url            = "883585999409.dkr.ecr.us-east-1.amazonaws.com/app47/captcha-demo:latest"
 zone_id              = "Z02768172R6QFAJA6KWK9"
