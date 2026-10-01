@@ -37,7 +37,7 @@ jobs:
       - name: Set up AWS Credentials
         uses: aws-actions/configure-aws-credentials@v6
         with:
-          role-to-assume: arn:aws:iam::883585999409:role/GH_CICD
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/app47/github/gha-captcha-demo-production
           aws-region: us-east-1
 
       - name: Login to Amazon ECR
