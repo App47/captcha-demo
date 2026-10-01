@@ -1,13 +1,17 @@
 locals {
-  # Centralize common names so they’re consistent everywhere
-  cluster_name       = "${var.app_name}-cluster"
-  service_name       = "${var.app_name}-service"
-  log_group_name     = "/ecs/${var.app_name}"
-  tg_name            = "${var.app_name}-tg"
-  alb_name           = "${var.app_name}-alb"
-  alb_sg_name        = "${var.app_name}-alb-sg"
-  svc_sg_name        = "${var.app_name}-svc-sg"
-  ecs_task_name      = "${var.app_name}-task-role"
-  ecs_task_execution = "${var.app_name}-execution-role"
-  ecs_kms_name       = "${var.app_name}-exec-ssm-kms"
+  # captcha-demo-{environment}-{role}. This app has no tenant.
+  project     = "captcha-demo"
+  name_prefix = "${local.project}-${var.env_name}"
+
+  cluster_name                 = "${local.name_prefix}-cluster"
+  service_name                 = "${local.name_prefix}-service"
+  task_family                  = "${local.name_prefix}-task"
+  container_name               = local.project
+  log_group_name               = "/ecs/${local.name_prefix}"
+  tg_name                      = "${local.name_prefix}-tg"
+  svc_sg_name                  = "${local.name_prefix}-ecs-sg"
+  ecs_task_name                = "${local.name_prefix}-task-role"
+  ecs_task_execution           = "${local.name_prefix}-execution-role"
+  ecs_kms_name                 = "${local.name_prefix}-ssm-kms"
+  rails_master_key_policy_name = "${local.name_prefix}-rails-master-key"
 }

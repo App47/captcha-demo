@@ -1,6 +1,6 @@
 # Grant the execution role permission to read the Rails master key from SSM
 resource "aws_iam_policy" "ecs_exec_read_rails_master_key" {
-  name        = "${var.env_name}-ecs-exec-read-rails-master-key"
+  name        = local.rails_master_key_policy_name
   description = "Allow ECS task execution role to read Rails master key from SSM Parameter Store"
   policy = jsonencode({
     Version = "2012-10-17",
