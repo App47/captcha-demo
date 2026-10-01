@@ -1,60 +1,63 @@
 # captcha-demo
 
-Hold the Captcha Demo for customers
+Rails example of the App47 Captcha service, shown as a password-reset form.
 
-The purpose of this repo is show a working example of the App47 Captcha Service using a simple static web site:
+The page loads the captcha widget from the CDN. The server signs an ES256 JWT to start the challenge, then signs a second JWT to validate the token the widget returns. A working copy of each step is in this repo:
 
-* [index.html](web/index.html)
-* [success.html](web/success.html)
-* [error.html](web/error.html)
+* Widget markup: [app/views/demos/show.html.erb](app/views/demos/show.html.erb)
+* Widget script: [app/views/layouts/application.html.erb](app/views/layouts/application.html.erb)
+* Start and submit: [app/controllers/demos_controller.rb](app/controllers/demos_controller.rb)
+* API calls: [app/services/captcha_client.rb](app/services/captcha_client.rb)
+* JWT signing: [app/services/jwt_signer.rb](app/services/jwt_signer.rb)
 
-Along with a single lambda function that acts as the form handler for the static web site.
+## Credentials
 
-* [submit.py](lambda/submit.py)
+Rails credentials hold the API location and the signing key. `jwt.api_url` needs a trailing slash, because the client appends `nonce` and `validate` directly.
 
-This demo does not implement any strong security measures for starting the captcha process, but does highlight where that would plug in.
+```yaml
+jwt:
+  api_url: https://captcha.app47.net/
+  issuer: your-issuer
+  audience: your-audience
+  private_key_pem: |
+    -----BEGIN EC PRIVATE KEY-----
+    ...
+    -----END EC PRIVATE KEY-----
+  kid: your-key-id
+cdn_url: https://your-cdn.example/
+```
 
-## Browser setup and configuration
+The private key is an EC key on P-256. The widget script and stylesheet are loaded from `cdn_url` as `widget.min.js` and `widget.min.css`.
 
-The browser showing the captcha input must have two elements, the captcha div and the captcha JS file. Let's start with the 
-captcha div. In your form, where you would like the captcha element placed, put the following snippet.
+## Browser setup
+
+Load the widget script on the page:
 
 ```html
-        <!-- CAPTCHA container -->
-        <cap-widget
-                id="cap"
-                data-cap-api-endpoint="https://captcha.app47.net/"
-                data-cap-hidden-field-name="captcha-token">
-        </cap-widget>
-        <!-- Hidden input to carry proof -->
-        <input type="hidden" id="captcha-token" name="captchaToken">
+<script src="https://your-cdn.example/widget.min.js"></script>
 ```
 
-If you do want to change the name of the field in the form to store the token, then be sure to change it in the cap-widget as well as the id of the hidden input.
+Put the widget in the form. The server passes a JWT that already contains the nonce (see below). The widget writes the solved token and the nonce into the hidden fields named here.
 
-An example of this setup can be found in [index.html](web/index.html).
-
-### Optional debug statement
-
-If you would like to see some debug output in the browser console, you can register an event listener when the challenges are solved.
-
-Either as an embedded script, or in a javascript file, add the following script
-
-```javascript
-  const widget = document.querySelector("#cap");
-
-  widget.addEventListener("solve", function (e) {
-    const token = e.detail.token;
-    console.log("Token: " + token);
-  });
+```html
+<cap-widget id="cap"
+            data-cap-api-endpoint="https://captcha.app47.net/"
+            data-cap-css-url="https://your-cdn.example/widget.min.css"
+            data-cap-token-field-name="cap_token"
+            data-cap-nonce-field-name="cap_nonce"
+            data-cap-jwt-token="SIGNED_JWT_WITH_NONCE">
+</cap-widget>
 ```
 
-## Validation Endpoint Usage
+On submit, the form sends `cap_token` and `cap_nonce` with the rest of the fields. This demo also sends `email`.
 
-The second area to setup is to configure the validation end point. This will happen wherever the end point of the form is submitted. 
-While a working example can found in [submit.py](lambda/submit.py), the steps to write your own validation end point are listed below.
+## Server flow
 
-1. Receive the form input and extract the captcha-token field from the form submission.
-2. Post the validation token in `application/json` to the end point `https://captcha.app47.net/validate`
-3. If the post is valid, you will get a http response `200` with a JSON payload.
-4. Verify the payload of `{'success': true}`
+Every call is a `GET` with `Authorization: Bearer <jwt>`. The JWT uses `ES256`. The header carries `kid`. The payload always includes `iss`, `aud`, and `iat` from the credentials above.
+
+1. Sign a JWT with only those default claims and `GET {api_url}nonce`. The JSON body contains `nonce`.
+2. Sign a second JWT that adds `nonce`, and pass that token to the widget as `data-cap-jwt-token`.
+3. When the form is submitted, require the nonce and the token. Sign a third JWT that adds both `token` and `nonce`, and `GET {api_url}validate`.
+4. HTTP 204 means the captcha is valid. Any other status is a failure.
+
+`CaptchaClient#fetch_nonce` and `CaptchaClient#verify_reset!` are the reference for steps 1 and 3.
