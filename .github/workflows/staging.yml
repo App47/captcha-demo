@@ -22,15 +22,15 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Set IMAGE_URI
         run: echo "IMAGE_URI=${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:${IMAGE_TAG}" >> "$GITHUB_ENV"
 
       - name: Set up AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v5
+        uses: aws-actions/configure-aws-credentials@v6
         with:
-          role-to-assume: arn:aws:iam::883585999409:role/GH_CICD
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/app47/github/gha-captcha-demo-staging
           aws-region: us-east-1
 
       - name: Login to Amazon ECR
@@ -42,7 +42,7 @@ jobs:
           docker buildx build --platform linux/amd64 -t "${IMAGE_URI}" --push .
 
       - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
+        uses: hashicorp/setup-terraform@v4
 
       - name: Terraform init
         working-directory: infra/staging
@@ -70,7 +70,7 @@ jobs:
       - name: Force ECS new deployment (only needed if reusing same tag)
         run: |
           aws ecs update-service \
-            --cluster staging-captcha-demo-cluster \
-            --service staging-captcha-demo-service \
+            --cluster captcha-demo-staging-cluster \
+            --service captcha-demo-staging-service \
             --force-new-deployment \
             --region "${AWS_REGION}"

@@ -16,6 +16,7 @@ crash.log
 
 # Plan files
 terraform.plan
+tfplan
 
 # Local override files
 override.tf
