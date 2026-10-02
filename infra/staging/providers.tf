@@ -15,7 +15,7 @@ provider "aws" {
   # Optional: default tags on all resources
   default_tags {
     tags = {
-      Application = var.app_name
+      Project     = "captcha-demo"
       Environment = var.env_name
       ManagedBy   = "Terraform"
     }

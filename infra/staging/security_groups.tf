@@ -3,6 +3,10 @@ resource "aws_security_group" "ecs_service" {
   description = "Allow inbound from ALB only"
   vpc_id      = var.vpc_id
 
+  tags = {
+    Role = "ecs-sg"
+  }
+
   ingress {
     from_port       = 3000
     to_port         = 3000

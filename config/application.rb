@@ -6,7 +6,7 @@ require "action_view/railtie"
 
 Bundler.require(*Rails.groups)
 
-module ResetDemo
+module CaptchaDemo
   class Application < Rails::Application
     config.load_defaults 7.2
     config.time_zone = "UTC"
