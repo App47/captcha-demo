@@ -2,7 +2,6 @@ variable "aws_region" { default = "us-east-1" }
 variable "vpc_id" { default = "vpc-80991be5" }
 variable "alb_subnet_ids" { type = list(string) }
 variable "ecs_subnet_ids" { type = list(string) }
-variable "cert_arn" {}
 variable "fqdn_name" {}
 variable "env_name" {}
 variable "container_port" { default = 3000 }

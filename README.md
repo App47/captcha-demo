@@ -61,3 +61,27 @@ Every call is a `GET` with `Authorization: Bearer <jwt>`. The JWT uses `ES256`. 
 4. HTTP 204 means the captcha is valid. Any other status is a failure.
 
 `CaptchaClient#fetch_nonce` and `CaptchaClient#verify_reset!` are the reference for steps 1 and 3.
+
+## HTTPS certificates
+
+Both `infra/staging` (`captcha-demo.app47.net`) and `infra/production`
+(`captcha-demo.app47.com`) request dedicated ACM public certificates, publish
+Route 53 DNS validation records, wait for issuance, and attach the validated
+certificates to the shared ALB HTTPS listener using SNI. Keep the validation
+records in place so ACM can renew the certificates automatically.
+
+Deploy staging first through the existing staging workflow, then production
+through the production workflow. Review each Terraform plan: it should add the
+certificate, validation records, validation waiter, and listener attachment.
+The shared listener's default certificate remains managed by its owning stack.
+The deployment roles need ACM request/read/tag/delete permissions, Route 53
+record management permissions for their hosted zones, and ELB listener
+certificate read/add/remove permissions.
+
+After each deployment, check the `certificate_arn` output, confirm the certificate
+is `ISSUED` in ACM and attached to the listener, and verify the hostname serves
+that certificate over HTTPS. The previous certificate ARNs were unused inputs
+in this repository; any old attachments or imported certificates belong to
+external infrastructure. Retire them through their owning stack only after
+checking that no other hostnames or services depend on them and that the new
+certificate is being served.
