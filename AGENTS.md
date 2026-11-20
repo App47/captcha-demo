@@ -43,9 +43,11 @@ the demo's browser challenge and server-side validation flow.
 
 - Keep `.ruby-version`, `Gemfile`, `Gemfile.lock`, and the Docker build and
   runtime stages on the same Ruby version. Staging CI reads `.ruby-version`.
-- Pushes to `feature/*` run the staging workflow, which tests the app before
-  building and deploying the image. The manual production workflow promotes
-  an existing image.
+- The staging workflow tests the app before building and deploying the image.
+  A deployment branch must match both the push filters in
+  `.github/workflows/staging.yml` and the staging role's GitHub OIDC trust
+  policy in `App47/aws-config`.
+- The manual production workflow promotes an existing image.
 - After a runtime change deploys to staging, open `/demo` on
   `captcha-demo.app47.net`, complete the widget challenge, and submit the form.
   Confirm the success page and check the Ruby version in the running ECS task's
